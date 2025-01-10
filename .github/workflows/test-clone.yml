@@ -1,17 +1,19 @@
-name: Test Clone Specific Folder
+name: Sync Specific Folder from Upstream
 
 on:
   workflow_dispatch: # Allow manual trigger
 
 jobs:
-  test-clone:
-    name: Test Clone Specific Folder
+  sync-folder:
+    name: Sync Folder to Terraform Docs Repo
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout an empty repo
-      - name: Checkout Repo
+      # 1. Checkout your forked repo
+      - name: Checkout Your Repo
         uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       # 2. Clone Upstream Repository with Sparse Checkout
       - name: Clone Specific Folder
@@ -30,14 +32,18 @@ jobs:
           # Pull the specified folder
           git pull origin main
 
-          # Debugging: List contents of the cloned directory
-          echo "Listing contents of 'website/docs/r':"
-          ls -R website/docs/r
-          
+          # Copy the required files into your repo
           cd ..
+          mkdir -p website/docs/r
+          cp -r upstream-repo/website/docs/r/* website/docs/r/
 
-      # 3. Debug Output
-      - name: Debug Workspace
+      # 3. Commit and Push Changes to Your Repo
+      - name: Commit and Push Changes
         run: |
-          echo "Listing workspace:"
-          ls -R
+          set -e
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .
+          git commit -m "Sync .md files from upstream repository"
+          git push origin main
