@@ -18,10 +18,26 @@ jobs:
         run: |
           set -e
           echo "Cloning upstream repository with sparse checkout..."
+          
+          # Clone only the structure, no files yet
           git clone --depth 1 --filter=blob:none --sparse https://github.com/hashicorp/terraform-provider-aws.git upstream-repo
           cd upstream-repo
+          
+          # Enable sparse-checkout and specify the folder
           git sparse-checkout init --cone
           git sparse-checkout set website/docs/r
-          echo "Folder content:"
+
+          # Pull the specified folder
+          git pull origin main
+
+          # Debugging: List contents of the cloned directory
+          echo "Listing contents of 'website/docs/r':"
           ls -R website/docs/r
+          
           cd ..
+
+      # 3. Debug Output
+      - name: Debug Workspace
+        run: |
+          echo "Listing workspace:"
+          ls -R
