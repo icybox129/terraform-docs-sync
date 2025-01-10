@@ -1,0 +1,27 @@
+name: Test Clone Specific Folder
+
+on:
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  test-clone:
+    name: Test Clone Specific Folder
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout an empty repo
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      # 2. Clone Upstream Repository with Sparse Checkout
+      - name: Clone Specific Folder
+        run: |
+          set -e
+          echo "Cloning upstream repository with sparse checkout..."
+          git clone --depth 1 --filter=blob:none --sparse https://github.com/hashicorp/terraform-provider-aws.git upstream-repo
+          cd upstream-repo
+          git sparse-checkout init --cone
+          git sparse-checkout set website/docs/r
+          echo "Folder content:"
+          ls -R website/docs/r
+          cd ..
