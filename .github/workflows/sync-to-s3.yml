@@ -23,7 +23,7 @@ jobs:
 
       - name: Sync .md Files to S3
         run: |
-          aws s3 sync website/docs/r s3://your-s3-bucket-name/docs/
+          aws s3 sync website/docs/r s3://nick-terraform-test-docs/data/raw/
         env:
           AWS_DEFAULT_REGION: eu-west-2
 
